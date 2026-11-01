@@ -70,17 +70,7 @@ jobs:
           LASTFM_API_KEY: ${{ secrets.LASTFM_API_KEY }}
           LASTFM_SECRET: ${{ secrets.LASTFM_SECRET }}
 
-      - name: Sign APK
-        uses: ilharp/sign-android-release@v2.0.0
-        with:
-          releaseDir: app/build/outputs/apk/${{ matrix.variant }}/release/
-          signingKey: ${{ secrets.KEYSTORE }}
-          keyAlias: ${{ secrets.KEY_ALIAS }}
-          keyStorePassword: ${{ secrets.KEYSTORE_PASSWORD }}
-          keyPassword: ${{ secrets.KEY_PASSWORD }}
-          buildToolsVersion: 36.0.0
-
-      - name: Move signed APK
+      - name: Prepare release APK
         run: |
           OUTPUT_DIR="app/build/outputs/apk/${{ matrix.variant }}/release"
           mkdir -p "$OUTPUT_DIR/out"
@@ -89,9 +79,11 @@ jobs:
           else
             TARGET_NAME="app-universal-release.apk"
           fi
-          find "$OUTPUT_DIR" -name "*-signed.apk" -o -name "*-unsigned-signed.apk" | xargs -I{} mv {} "$OUTPUT_DIR/out/$TARGET_NAME"
+          APK_PATH=$(find "$OUTPUT_DIR" -maxdepth 1 -name "*.apk" | head -n 1)
+          test -n "$APK_PATH"
+          cp "$APK_PATH" "$OUTPUT_DIR/out/$TARGET_NAME"
 
-      - name: Upload Signed APK
+      - name: Upload Release APK
         uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.variant == 'gms' && 'app-with-Google-Cast' || 'app-release' }}
