@@ -42,30 +42,11 @@ object DiscordActivityBuilder {
                 detailsTemplate.ifEmpty { DiscordDefaults.DETAILS_TEMPLATE },
                 songTitle, artistName, albumName, song.song.id
             )
-            renderedBtn1Label = if (btn1Enabled) {
-                DiscordTemplateRenderer.render(
-                    btn1Label.ifEmpty { DiscordDefaults.BUTTON1_LABEL },
-                    songTitle, artistName, albumName, song.song.id
-                )
-            } else null
-            renderedBtn1Url = if (btn1Enabled) {
-                DiscordTemplateRenderer.render(
-                    btn1Url.ifEmpty { DiscordDefaults.BUTTON1_URL_TEMPLATE },
-                    songTitle, artistName, albumName, song.song.id
-                )
-            } else null
-            renderedBtn2Label = if (btn2Enabled) {
-                DiscordTemplateRenderer.render(
-                    btn2Label.ifEmpty { DiscordDefaults.BUTTON2_LABEL },
-                    songTitle, artistName, albumName, song.song.id
-                )
-            } else null
-            renderedBtn2Url = if (btn2Enabled) {
-                DiscordTemplateRenderer.render(
-                    btn2Url.ifEmpty { DiscordDefaults.BUTTON2_URL },
-                    songTitle, artistName, albumName, song.song.id
-                )
-            } else null
+            // Buttons are intentionally omitted from the Discord activity.
+            renderedBtn1Label = null
+            renderedBtn1Url = null
+            renderedBtn2Label = null
+            renderedBtn2Url = null
         } else {
             state = artistName
             details = songTitle
