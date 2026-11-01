@@ -135,6 +135,19 @@ jobs:
       - name: Restore Persistent Keystore
         run: |
           echo "${{ secrets.DEBUG_KEYSTORE }}" | base64 -d > ./app/persistent-debug.keystore
+          if ! keytool -list -keystore ./app/persistent-debug.keystore -storepass android >/dev/null 2>&1; then
+            echo "DEBUG_KEYSTORE is missing or invalid; generating a fresh debug keystore."
+            rm -f ./app/persistent-debug.keystore
+            keytool -genkeypair -v \
+              -keystore ./app/persistent-debug.keystore \
+              -storepass android \
+              -keypass android \
+              -alias androiddebugkey \
+              -keyalg RSA \
+              -keysize 2048 \
+              -validity 10000 \
+              -dname "CN=Android Debug,O=Android,C=US"
+          fi
 
       # Lint is intentionally not run in CI: it never gated a merge and added
       # several minutes to every build. Run :app:lintGmsRelease locally.
