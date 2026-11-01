@@ -69,10 +69,10 @@ object DiscordActivityBuilder {
         } else {
             state = artistName
             details = songTitle
-            renderedBtn1Label = DiscordDefaults.BUTTON1_LABEL
-            renderedBtn1Url = "${DiscordDefaults.YOUTUBE_WATCH_URL}${song.song.id}"
-            renderedBtn2Label = DiscordDefaults.BUTTON2_LABEL
-            renderedBtn2Url = DiscordDefaults.BUTTON2_URL
+            renderedBtn1Label = null
+            renderedBtn1Url = null
+            renderedBtn2Label = null
+            renderedBtn2Url = null
         }
 
         val renderedName = if (advancedMode && !activityName.isNullOrEmpty()) {
