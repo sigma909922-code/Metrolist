@@ -70,6 +70,30 @@ jobs:
           LASTFM_API_KEY: ${{ secrets.LASTFM_API_KEY }}
           LASTFM_SECRET: ${{ secrets.LASTFM_SECRET }}
 
+      - name: Sign release APK with CI key
+        run: |
+          OUTPUT_DIR="app/build/outputs/apk/${{ matrix.variant }}/release"
+          APK_PATH=$(find "$OUTPUT_DIR" -maxdepth 1 -name "*.apk" | head -n 1)
+          test -n "$APK_PATH"
+          keytool -genkeypair -v \
+            -keystore /tmp/metrolist-ci.keystore \
+            -storepass android \
+            -keypass android \
+            -alias androiddebugkey \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -dname "CN=Metrolist CI,O=Metrolist,C=US"
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -name apksigner | sort -V | tail -n 1)
+          "$APKSIGNER" sign \
+            --ks /tmp/metrolist-ci.keystore \
+            --ks-pass pass:android \
+            --key-pass pass:android \
+            --ks-key-alias androiddebugkey \
+            --out "$OUTPUT_DIR/metrolist-signed.apk" \
+            "$APK_PATH"
+          rm "$APK_PATH"
+
       - name: Prepare release APK
         run: |
           OUTPUT_DIR="app/build/outputs/apk/${{ matrix.variant }}/release"
@@ -79,7 +103,7 @@ jobs:
           else
             TARGET_NAME="app-universal-release.apk"
           fi
-          APK_PATH=$(find "$OUTPUT_DIR" -maxdepth 1 -name "*.apk" | head -n 1)
+          APK_PATH="$OUTPUT_DIR/metrolist-signed.apk"
           test -n "$APK_PATH"
           cp "$APK_PATH" "$OUTPUT_DIR/out/$TARGET_NAME"
 
